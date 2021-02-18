@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "fishingbuddy-web",
+  "private_key_id": "d0a7db40110f4476d5b08675caaa39f555333872",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD31YFNnFyaozgv\n6W7a1dWP1Grca0vr5ens0sNKOqiCQ6jGdzLZgKNOSa2BDTBRw1UuxXKvfiwD1dec\nxo4dNxy7zxAVDM3dccmgTTCnZMVbnDXf4kCKC8c9Gbgy/ToTuwuKwUQxVS3SMVxu\nuvSvTjOkj2dA+gtRjcDippYUMMYTqDa+WjUzRWHGDk03NqjvXft69LKLskxf83ej\nS0+EDo9OD9uVIqYKtg/sHGl+UaP9snjaT7EchPxsug1N+pL2ctBpKGRbXt7dgVKi\n0+1mNTa0rnexWHqanq3jpjby0FsLDUJCD963J43Q18YIBpEI+/lXAIrB0UxbRYYl\nszav9y8ZAgMBAAECggEAEanFqkE2ImP2nweNOeCFSi0dTpyrumIrqWVzZgjHNhLa\nEQcGzen1TvZA/OfH5VPoGsoXZzrf/91PnXdTQpweb/jiewrraIMcbSXYjV2eaUM5\nXb2o1DiMWHugSAC0kRptc1QHPFgx81ScSLIKEAJ2ph2oV2uwFH28sl/6u0anSgLj\nuDeP+pHNS4+9azndKKpuGyInEMTR/HOWBdwPCGh2d9L1E4hS555F9fEblB1wBLtP\nO5oYCxfNbYwP1DZU6pQV+5JYGBW/BT5FhyNEcfc++sfhoYRgpsLu3i63iFplrz3z\nAlzE+kijWwWJSkWDxvtVoteZmEXe4nklR3erqakymQKBgQD9vMQHv5eGdo80QnlX\nv369n9brMMSigGLxYXklak360/ygDdY9HMoONNQoC7gulRdcTWs8ZSi9iI2rcryR\nvElsLKvMHIfmT8E2Q0pPzQ58BAEYUfeXb9Nxd6t+JuZTc0WrcqhRM6jPjB5QhTqG\nvATgWCzk2V2ui0xn/MI8QEPhpQKBgQD6C0NaA0nk2HN9BPcsaw9d2e7TGPtqY/fU\nhrXcpjeAl9llpjA5P9m0oCPqrI7o7QguipvtdSa+Gaqvd9Rfiez/qelhQioU75Er\nx34Xm1efBQjhM1SZ4YdptI8fHp+kyyCqg9FeaYcmDqvUy+BOteq0W5z9ToGjgwn8\nIteToBg1ZQKBgQD73wh8ZIwmNsQ6bQ4Es5s84lC2ECfw4x7UWxylrluP9CReQL38\n1foglgJPaiq/WtHglx0uy3/gfI+cs/1JcS01CzbSGzQvw9WYZr16b6PEKTlpCdyL\nX771cIQ0aqrSBagP43X/fRdCRuXEqiuJmVQB2qVd2gNrgu0qgDXTFzwK3QKBgQCF\nyp8IO/g/Dh6Fh7GmP8biJelnZNeqLsF+I3KOFRZfpWC6xjjJeUPJJWLyf9CcC7C0\nDpCud1/6mgs9hnXJhSieCFGLK/cOar2X2k+62/D/cpc0wN2E1Ss6wVVPhnhPmizp\ncE0IIpkhIPqKi2iDVU23ocmXtHkjf8tI8W++Wwx5DQKBgFidtqjgulXmZ/ZSC/6s\nVhPgEP+Yn6Ig3VAyEFEvBRSChWIAESSITwKkdOKWShiuc5UIKMntLgLq9vPFnr5A\n4ZrM9IqNb5s4CNyp7eWrKzz95o0bNcK5PgkAYFYqz6aFwklqzpZbXGbb/5QaRt5P\nAR0GnIBdE6xvhlmYn3w9CvsU\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-qxydt@fishingbuddy-web.iam.gserviceaccount.com",
+  "client_id": "101105713296078672490",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-qxydt%40fishingbuddy-web.iam.gserviceaccount.com"
+}
