@@ -58,7 +58,7 @@ app.put('/api/updatelist/:id', async (req, res) => {
   res.status(200).send(JSON.stringify(body))
 })
 
-// @desc    Update a test
+// @desc    Delete a test
 // @route   DELETE /api/deletelist/:id
 app.delete('/api/deletelist/:id', async (req, res) => {
   const paramId = req.params.id
