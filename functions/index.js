@@ -125,11 +125,36 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
     var count = 0;
     while(count < 3){
     db.ref(`gearsetup/${discretizedGearSetupList[count].setupId}`).on('value',function(snapshot) {
-      gearRecommendationResult.push(snapshot.val()) 
+        gearRecommendationResult.push(snapshot.val()) 
        })
        count+=1
       }
     res.status(200).send(JSON.stringify(gearRecommendationResult))
+  })
+})
+
+// @desc    Fetch all test
+// @route   GET /api/newsfeed
+// sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/newsfeed
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/newsfeed
+app.get('/api/newsfeed', async (req, res) => {
+  const snapshot = await db.ref('user')
+  snapshot.on('value', (snapshot) => {
+    const user = snapshot.val()
+    const userslist = []
+    for (let id in user) {
+      if(user[id].posts!=null){
+        const userposts = user[id].posts
+        for(let id in userposts){
+          userposts[id]['postId'] = id
+          userslist.push(userposts[id])
+        }
+      }
+    }
+    userslist.sort((a,b) => a.datePosted - b.datePosted)
+    console.log(userslist)
+
+    res.status(200).send(JSON.stringify(userslist))
   })
 })
 
