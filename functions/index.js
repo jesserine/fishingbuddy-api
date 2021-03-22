@@ -8,7 +8,7 @@ app.use(cors({ origin: true }))
 var serviceAccount = require('./permissions.json')
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://fishingbuddy-web-default-rtdb.firebaseio.com/',
+  databaseURL: 'https://fishingbuddy-mobile.firebaseio.com/',
 })
 const db = admin.database()
 
@@ -69,7 +69,7 @@ app.delete('/api/deletelist/:id', async (req, res) => {
   res.status(200).send(JSON.stringify('removed'))
 })
 
-// @desc    Fetch all test
+// @desc    Fetch all products,
 // @route   GET /api/productslist
 app.get('/api/productslist', async (req, res) => {
   const snapshot = await db.ref('products')
@@ -83,7 +83,7 @@ app.get('/api/productslist', async (req, res) => {
   })
 })
 
-// @desc    Fetch single test
+// @desc    Fetch single product.
 // @route   GET /api/testlist/:id
 app.get('/api/productslist/:id', async (req, res) => {
   const paramId = req.params.id
@@ -98,8 +98,7 @@ app.get('/api/productslist/:id', async (req, res) => {
   })
 })
 
-
-// @desc    Fetch all test
+// @desc    Fetch top 3 recommended fishing gears.
 // @route   GET /api/recommendgear
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendgear/spinning/spinning/multicolor/monofilament/minnow/shorecasting/small/amateur/5000
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendgear/1/1/2/3/1/1/1/1/5000
@@ -133,7 +132,7 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
   })
 })
 
-// @desc    Fetch all test
+// @desc    Fetch all newsfeed posts for social page.
 // @route   GET /api/newsfeed
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/newsfeed
 // sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/newsfeed
@@ -163,5 +162,49 @@ function calculateKNN(userPreference, gearSetups){
   
   return distance
 }
+
+// @desc    Fetch all news for discover page.
+// @route   GET /api/news
+// sample   GET http://localhost:5001/fishingbuddy-web/us-central1/app/api/news
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/news
+app.get('/api/news', async (req, res) => {
+  const snapshot = await db.ref('discover/news')
+  snapshot.on('value', (snapshot) => {
+    const discover = snapshot.val()
+    const newslist = []
+    for (let id in discover) {
+      newslist.push(discover[id])
+    }
+    console.log(newslist)
+    res.status(200).send(JSON.stringify(newslist))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishlist
+app.get('/api/fishlist', async (req, res) => {
+  const snapshot = await db.ref('discover/fishlist')
+  snapshot.on('value', (snapshot) => {
+    const fish = snapshot.val()
+    const fishList = []
+    for (let id in fish) {
+      fish[id]['fishID'] = id
+      fishList.push(fish[id])
+    }
+    res.status(200).send(JSON.stringify(fishList))
+  })
+})
+
+// @desc    Fetch single product.
+// @route   GET /api/testlist/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishlist/-MVCA-81zxk1ntkrcnWw
+app.get('/api/fishlist/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishlist/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const fish = snapshot.val()
+    res.status(200).send(JSON.stringify(fish))
+  })
+})
 
 exports.app = functions.https.onRequest(app)
