@@ -227,7 +227,7 @@ app.get('/api/fishingtechniques', async (req, res) => {
 })
 
 // @desc    Fetch all fishes for discover page.
-// @route   GET /api/fishingtechniques
+// @route   GET /api/fishingtechniques/:id
 //sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishingtechniques/-MUU2UPHhWcVTsL60_GZ
 app.get('/api/fishingtechniques/:id', async (req, res) => {
   const paramId = req.params.id
@@ -238,5 +238,33 @@ app.get('/api/fishingtechniques/:id', async (req, res) => {
   })
 })
 
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/bfarregulations
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations
+app.get('/api/bfarregulations', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/bfarregulations')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const bfarregulations = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      bfarregulations.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(bfarregulations))
+  })
+})
+
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/bfarregulations/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations/-MUit6QQKWoidN_14eYl
+app.get('/api/bfarregulations/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/bfarregulations/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const bfarregulation = snapshot.val()
+    res.status(200).send(JSON.stringify(bfarregulation))
+  })
+})
 
 exports.app = functions.https.onRequest(app)
