@@ -294,4 +294,32 @@ app.get('/api/endangeredspecies/:id', async (req, res) => {
   })
 })
 
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/catchsizeregulations
+app.get('/api/catchsizeregulations', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/catchsizerules')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const catchsizerules = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      catchsizerules.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(catchsizerules))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/endangeredspecies/-MUihfZpY5mdcaSvEPL-
+app.get('/api/catchsizeregulations/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/catchsizerules/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const catchsizerule = snapshot.val()
+    res.status(200).send(JSON.stringify(catchsizerule))
+  })
+})
+
 exports.app = functions.https.onRequest(app)
