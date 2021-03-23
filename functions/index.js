@@ -254,7 +254,6 @@ app.get('/api/bfarregulations', async (req, res) => {
   })
 })
 
-
 // @desc    Fetch all fishes for discover page.
 // @route   GET /api/bfarregulations/:id
 //sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations/-MUit6QQKWoidN_14eYl
@@ -264,6 +263,34 @@ app.get('/api/bfarregulations/:id', async (req, res) => {
   snapshot.on('value', (snapshot) => {
     const bfarregulation = snapshot.val()
     res.status(200).send(JSON.stringify(bfarregulation))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations
+app.get('/api/endangeredspecies', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/endangeredspecies')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const endangeredSpecies = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      endangeredSpecies.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(endangeredSpecies))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/endangeredspecies/-MUihfZpY5mdcaSvEPL-
+app.get('/api/endangeredspecies/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/endangeredspecies/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const endangeredSpecie = snapshot.val()
+    res.status(200).send(JSON.stringify(endangeredSpecie))
   })
 })
 
