@@ -71,6 +71,7 @@ app.delete('/api/deletelist/:id', async (req, res) => {
 
 // @desc    Fetch all products,
 // @route   GET /api/productslist
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist
 app.get('/api/productslist', async (req, res) => {
   const snapshot = await db.ref('products')
   snapshot.on('value', (snapshot) => {
@@ -85,6 +86,7 @@ app.get('/api/productslist', async (req, res) => {
 
 // @desc    Fetch single product.
 // @route   GET /api/testlist/:id
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist
 app.get('/api/productslist/:id', async (req, res) => {
   const paramId = req.params.id
   const snapshot = await db.ref(`products/${paramId}`)
@@ -182,6 +184,7 @@ app.get('/api/news', async (req, res) => {
 
 // @desc    Fetch all fishes for discover page.
 // @route   GET /api/fishlist
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishlist
 app.get('/api/fishlist', async (req, res) => {
   const snapshot = await db.ref('discover/fishlist')
   snapshot.on('value', (snapshot) => {
@@ -206,5 +209,34 @@ app.get('/api/fishlist/:id', async (req, res) => {
     res.status(200).send(JSON.stringify(fish))
   })
 })
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishingtechniques
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishingtechniques
+app.get('/api/fishingtechniques', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingtechniques')
+  snapshot.on('value', (snapshot) => {
+    const technique = snapshot.val()
+    const techniqueList = []
+    for (let id in technique) {
+      technique[id]['techniqueID'] = id
+      techniqueList.push(technique[id])
+    }
+    res.status(200).send(JSON.stringify(techniqueList))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishingtechniques
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishingtechniques/-MUU2UPHhWcVTsL60_GZ
+app.get('/api/fishingtechniques/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingtechniques/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const technique = snapshot.val()
+    res.status(200).send(JSON.stringify(technique))
+  })
+})
+
 
 exports.app = functions.https.onRequest(app)
