@@ -134,6 +134,12 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
   })
 })
 
+function calculateKNN(userPreference, gearSetups){
+  var distance = (Math.pow(userPreference[0]-gearSetups.rodScore,2)+Math.pow(userPreference[1]-gearSetups.reelScore,2)+Math.pow(userPreference[2]-gearSetups.braidlineScore,2)+Math.pow(userPreference[3]-gearSetups.leaderlineScore,2)+Math.pow(userPreference[4]-gearSetups.lureScore,2)+Math.pow(userPreference[5]-gearSetups.environmentScore,2)+Math.pow(userPreference[6]-gearSetups.catchScore,2)+Math.pow(userPreference[7]-gearSetups.hobbyistScore,2)+Math.pow(userPreference[8]-gearSetups.priceScore,2)).toFixed(2)
+  
+  return distance
+}
+
 // @desc    Fetch all newsfeed posts for social page.
 // @route   GET /api/newsfeed
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/newsfeed
@@ -144,26 +150,21 @@ app.get('/api/newsfeed', async (req, res) => {
     const user = snapshot.val()
     const userslist = []
     for (let id in user) {
+      const userID = id
       if(user[id].posts!=null){
         const userposts = user[id].posts
         for(let id in userposts){
           userposts[id]['postId'] = id
+          userposts[id]['authorId'] = userID
           userslist.push(userposts[id])
         }
       }
     }
     userslist.sort((a,b) => a.datePosted - b.datePosted)
-    console.log(userslist)
 
     res.status(200).send(JSON.stringify(userslist))
   })
 })
-
-function calculateKNN(userPreference, gearSetups){
-  var distance = (Math.pow(userPreference[0]-gearSetups.rodScore,2)+Math.pow(userPreference[1]-gearSetups.reelScore,2)+Math.pow(userPreference[2]-gearSetups.braidlineScore,2)+Math.pow(userPreference[3]-gearSetups.leaderlineScore,2)+Math.pow(userPreference[4]-gearSetups.lureScore,2)+Math.pow(userPreference[5]-gearSetups.environmentScore,2)+Math.pow(userPreference[6]-gearSetups.catchScore,2)+Math.pow(userPreference[7]-gearSetups.hobbyistScore,2)+Math.pow(userPreference[8]-gearSetups.priceScore,2)).toFixed(2)
-  
-  return distance
-}
 
 // @desc    Fetch all news for discover page.
 // @route   GET /api/news
