@@ -86,7 +86,8 @@ app.get('/api/productslist', async (req, res) => {
 
 // @desc    Fetch single product.
 // @route   GET /api/testlist/:id
-// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist/-MX2KpsSSs2vN4Y122V0
+// sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/productslist/-MX2KpsSSs2vN4Y122V0
 app.get('/api/productslist/:id', async (req, res) => {
   const paramId = req.params.id
   const snapshot = await db.ref(`products/${paramId}`)
@@ -97,6 +98,26 @@ app.get('/api/productslist/:id', async (req, res) => {
   })
 })
 
+// @desc    Fetch all products,
+// @route   GET /api/productslist
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/sellerproducts/XHeEMkE1QgSEIePxrX56aOy19bf2
+// sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/sellerproducts/XHeEMkE1QgSEIePxrX56aOy19bf2
+app.get('/api/sellerproducts/:id', async (req, res) => {
+  const userId = req.params.id
+  console.log("OwnerId", userId)
+  const snapshot = await db.ref('products')
+  snapshot.on('value', (snapshot) => {
+    const product = snapshot.val()
+    const productslist = []
+    for (let id in product) {
+      if(product[id].ownerId==userId){
+        console.log(product[id])
+        productslist.push(product[id])
+      }
+    }
+    res.status(200).send(JSON.stringify(productslist))
+  })
+})
 
 
 // @desc    Fetch top 3 recommended fishing gears.
