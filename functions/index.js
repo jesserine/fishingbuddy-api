@@ -8,7 +8,7 @@ app.use(cors({ origin: true }))
 var serviceAccount = require('./permissions.json')
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://fishingbuddy-web-default-rtdb.firebaseio.com/',
+  databaseURL: 'https://fishingbuddy-mobile.firebaseio.com/',
 })
 const db = admin.database()
 
@@ -69,8 +69,9 @@ app.delete('/api/deletelist/:id', async (req, res) => {
   res.status(200).send(JSON.stringify('removed'))
 })
 
-// @desc    Fetch all test
+// @desc    Fetch all products,
 // @route   GET /api/productslist
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist
 app.get('/api/productslist', async (req, res) => {
   const snapshot = await db.ref('products')
   snapshot.on('value', (snapshot) => {
@@ -83,8 +84,9 @@ app.get('/api/productslist', async (req, res) => {
   })
 })
 
-// @desc    Fetch single test
+// @desc    Fetch single product.
 // @route   GET /api/testlist/:id
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productslist
 app.get('/api/productslist/:id', async (req, res) => {
   const paramId = req.params.id
   const snapshot = await db.ref(`products/${paramId}`)
@@ -98,8 +100,7 @@ app.get('/api/productslist/:id', async (req, res) => {
   })
 })
 
-
-// @desc    Fetch all test
+// @desc    Fetch top 3 recommended fishing gears.
 // @route   GET /api/recommendgear
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendgear/spinning/spinning/multicolor/monofilament/minnow/shorecasting/small/amateur/5000
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendgear/1/1/2/3/1/1/1/1/5000
@@ -133,7 +134,13 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
   })
 })
 
-// @desc    Fetch all test
+function calculateKNN(userPreference, gearSetups){
+  var distance = (Math.pow(userPreference[0]-gearSetups.rodScore,2)+Math.pow(userPreference[1]-gearSetups.reelScore,2)+Math.pow(userPreference[2]-gearSetups.braidlineScore,2)+Math.pow(userPreference[3]-gearSetups.leaderlineScore,2)+Math.pow(userPreference[4]-gearSetups.lureScore,2)+Math.pow(userPreference[5]-gearSetups.environmentScore,2)+Math.pow(userPreference[6]-gearSetups.catchScore,2)+Math.pow(userPreference[7]-gearSetups.hobbyistScore,2)+Math.pow(userPreference[8]-gearSetups.priceScore,2)).toFixed(2)
+  
+  return distance
+}
+
+// @desc    Fetch all newsfeed posts for social page.
 // @route   GET /api/newsfeed
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/newsfeed
 // sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/newsfeed
@@ -143,25 +150,177 @@ app.get('/api/newsfeed', async (req, res) => {
     const user = snapshot.val()
     const userslist = []
     for (let id in user) {
+      const userID = id
       if(user[id].posts!=null){
         const userposts = user[id].posts
         for(let id in userposts){
           userposts[id]['postId'] = id
+          userposts[id]['authorId'] = userID
           userslist.push(userposts[id])
         }
       }
     }
     userslist.sort((a,b) => a.datePosted - b.datePosted)
-    console.log(userslist)
 
     res.status(200).send(JSON.stringify(userslist))
   })
 })
 
-function calculateKNN(userPreference, gearSetups){
-  var distance = (Math.pow(userPreference[0]-gearSetups.rodScore,2)+Math.pow(userPreference[1]-gearSetups.reelScore,2)+Math.pow(userPreference[2]-gearSetups.braidlineScore,2)+Math.pow(userPreference[3]-gearSetups.leaderlineScore,2)+Math.pow(userPreference[4]-gearSetups.lureScore,2)+Math.pow(userPreference[5]-gearSetups.environmentScore,2)+Math.pow(userPreference[6]-gearSetups.catchScore,2)+Math.pow(userPreference[7]-gearSetups.hobbyistScore,2)+Math.pow(userPreference[8]-gearSetups.priceScore,2)).toFixed(2)
-  
-  return distance
-}
+// @desc    Fetch all news for discover page.
+// @route   GET /api/news
+// sample   GET http://localhost:5001/fishingbuddy-web/us-central1/app/api/news
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/news
+app.get('/api/news', async (req, res) => {
+  const snapshot = await db.ref('discover/news')
+  snapshot.on('value', (snapshot) => {
+    const discover = snapshot.val()
+    const newslist = []
+    for (let id in discover) {
+      newslist.push(discover[id])
+    }
+    console.log(newslist)
+    res.status(200).send(JSON.stringify(newslist))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishlist
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishlist
+app.get('/api/fishlist', async (req, res) => {
+  const snapshot = await db.ref('discover/fishlist')
+  snapshot.on('value', (snapshot) => {
+    const fish = snapshot.val()
+    const fishList = []
+    for (let id in fish) {
+      fish[id]['fishID'] = id
+      fishList.push(fish[id])
+    }
+    res.status(200).send(JSON.stringify(fishList))
+  })
+})
+
+// @desc    Fetch single product.
+// @route   GET /api/testlist/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishlist/-MVCA-81zxk1ntkrcnWw
+app.get('/api/fishlist/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishlist/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const fish = snapshot.val()
+    res.status(200).send(JSON.stringify(fish))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishingtechniques
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishingtechniques
+app.get('/api/fishingtechniques', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingtechniques')
+  snapshot.on('value', (snapshot) => {
+    const technique = snapshot.val()
+    const techniqueList = []
+    for (let id in technique) {
+      technique[id]['techniqueID'] = id
+      techniqueList.push(technique[id])
+    }
+    res.status(200).send(JSON.stringify(techniqueList))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/fishingtechniques/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishingtechniques/-MUU2UPHhWcVTsL60_GZ
+app.get('/api/fishingtechniques/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingtechniques/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const technique = snapshot.val()
+    res.status(200).send(JSON.stringify(technique))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/bfarregulations
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations
+app.get('/api/bfarregulations', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/bfarregulations')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const bfarregulations = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      bfarregulations.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(bfarregulations))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/bfarregulations/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations/-MUit6QQKWoidN_14eYl
+app.get('/api/bfarregulations/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/bfarregulations/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const bfarregulation = snapshot.val()
+    res.status(200).send(JSON.stringify(bfarregulation))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/bfarregulations
+app.get('/api/endangeredspecies', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/endangeredspecies')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const endangeredSpecies = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      endangeredSpecies.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(endangeredSpecies))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/endangeredspecies/-MUihfZpY5mdcaSvEPL-
+app.get('/api/endangeredspecies/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/endangeredspecies/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const endangeredSpecie = snapshot.val()
+    res.status(200).send(JSON.stringify(endangeredSpecie))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/catchsizeregulations
+app.get('/api/catchsizeregulations', async (req, res) => {
+  const snapshot = await db.ref('discover/fishingregulations/catchsizerules')
+  snapshot.on('value', (snapshot) => {
+    const regulation = snapshot.val()
+    const catchsizerules = []
+    for (let id in regulation) {
+      regulation[id]['regulationID'] = id
+      catchsizerules.push(regulation[id])
+    }
+    res.status(200).send(JSON.stringify(catchsizerules))
+  })
+})
+
+// @desc    Fetch all fishes for discover page.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/endangeredspecies/-MUihfZpY5mdcaSvEPL-
+app.get('/api/catchsizeregulations/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`discover/fishingregulations/catchsizerules/${paramId}`)
+  snapshot.on('value', (snapshot) => {
+    const catchsizerule = snapshot.val()
+    res.status(200).send(JSON.stringify(catchsizerule))
+  })
+})
 
 exports.app = functions.https.onRequest(app)
