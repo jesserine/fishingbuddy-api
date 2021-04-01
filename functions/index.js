@@ -98,20 +98,37 @@ app.get('/api/productslist/:id', async (req, res) => {
   })
 })
 
-// @desc    Fetch all products,
-// @route   GET /api/productslist
+// @desc    Fetch all products by seller. 
+// @route   GET /api/sellerproducts/:id
 // sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/sellerproducts/XHeEMkE1QgSEIePxrX56aOy19bf2
 // sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/sellerproducts/XHeEMkE1QgSEIePxrX56aOy19bf2
 app.get('/api/sellerproducts/:id', async (req, res) => {
   const userId = req.params.id
-  console.log("OwnerId", userId)
   const snapshot = await db.ref('products')
   snapshot.on('value', (snapshot) => {
     const product = snapshot.val()
     const productslist = []
     for (let id in product) {
       if(product[id].ownerId==userId){
-        console.log(product[id])
+        productslist.push(product[id])
+      }
+    }
+    res.status(200).send(JSON.stringify(productslist))
+  })
+})
+
+// @desc    Fetch all products by category. 
+// @route   GET /api/productsoncategory/:id
+// sample   https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/productsoncategory/fish
+// sample   http://localhost:5001/fishingbuddy-web/us-central1/app/api/productsoncategory/fish
+app.get('/api/productsoncategory/:id', async (req, res) => {
+  const productCategory = req.params.id
+  const snapshot = await db.ref('products')
+  snapshot.on('value', (snapshot) => {
+    const product = snapshot.val()
+    const productslist = []
+    for (let id in product) {
+      if(product[id].category==productCategory){
         productslist.push(product[id])
       }
     }
