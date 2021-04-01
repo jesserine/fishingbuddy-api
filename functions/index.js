@@ -92,13 +92,12 @@ app.get('/api/productslist/:id', async (req, res) => {
   const snapshot = await db.ref(`products/${paramId}`)
   snapshot.on('value', (snapshot) => {
     const product = snapshot.val()
-    const productslist = []
-    for (let id in product) {
-      productslist.push(product[id])
-    }
+    console.log(product)
     res.status(200).send(JSON.stringify(product))
   })
 })
+
+
 
 // @desc    Fetch top 3 recommended fishing gears.
 // @route   GET /api/recommendgear
