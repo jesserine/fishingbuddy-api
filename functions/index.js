@@ -360,4 +360,42 @@ app.get('/api/catchsizeregulations/:id', async (req, res) => {
   })
 })
 
+app.get('/api/fishinghotspots/:latitude/:longitude', async (req, res) => {
+  //10.24870314947608, 123.79995056874762
+  const currenLatitude = req.params.latitude 
+  const currentLongitude = req.params.longitude
+  const snapshot = await db.ref('hotspot')
+  const nearmeHotspot = []
+
+  snapshot.on('value', (snapshot) => {
+    const hotspots = snapshot.val()
+    for(let id in hotspots){
+      const result = calculateDistance(currenLatitude, currentLongitude, hotspots[id]['latitude'], hotspots[id]['longitude']);
+      console.log("distance result ", result)
+      hotspots[id]['distanceFromCurrent'] = result
+      nearmeHotspot.push(hotspots[id])
+    }
+
+    nearmeHotspot.sort((a,b) => a.distanceFromCurrent - b.distanceFromCurrent);
+    res.status(200).send(JSON.stringify(nearmeHotspot))
+  })
+})
+
+//Haversine Formula
+function calculateDistance(curLatitude, curLongitude, hotspotLatitude, hotspotLongitude){
+  const prevLatInRad = toRad(hotspotLatitude);
+  const prevLongInRad = toRad(hotspotLongitude);
+  const latInRad = toRad(curLatitude);
+  const longInRad = toRad(curLongitude);
+
+  var result = 6377.830272 * Math.acos(Math.sin(prevLatInRad) * Math.sin(latInRad) + Math.cos(prevLatInRad) * Math.cos(latInRad) * Math.cos(longInRad - prevLongInRad),)
+  
+  return (
+     result.toFixed(2)
+  );
+}
+
+function toRad(angle){
+  return (angle * Math.PI) / 180;
+}
 exports.app = functions.https.onRequest(app)
