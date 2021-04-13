@@ -360,6 +360,9 @@ app.get('/api/catchsizeregulations/:id', async (req, res) => {
   })
 })
 
+// @desc    Fetch all fishing hotspots near fisherman/hobbyist's location.
+// @route   GET /api/fishinghotspots/:latitude/:longitude
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/fishinghotspots/10.24870314947608/123.79995056874762
 app.get('/api/fishinghotspots/:latitude/:longitude', async (req, res) => {
   //10.24870314947608, 123.79995056874762
   const currenLatitude = req.params.latitude 
