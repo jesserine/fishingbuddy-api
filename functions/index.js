@@ -404,22 +404,21 @@ function toRad(angle){
 
 // @desc    Fetch all fishing hotspots near fisherman/hobbyist's location.
 // @route   GET /api/fishinghotspots/:latitude/:longitude
-//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendcatch/300/1/1/0/0
+// sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendcatch/300/1/1/0/0
 app.get('/api/recommendcatch/:budget/:forSinugba/:forFried/:forKinilaw/:forTinuwa', async (req, res) => {
   const snapshot = await db.ref('products')
   const recommendedCatch = []
   
   var userPreference = [(req.params.budget/100).toFixed(2), req.params.forSinugba, req.params.forFried, req.params.forKinilaw, req.params.forTinuwa]
-  console.log("user preference: ", userPreference)
-
   snapshot.on('value', (snapshot) => {
     const products = snapshot.val()
+    
     for(let id in products){
-
-      if(products[id]['category'] == 'fish'){
+      var timeDifference = getDifferenceInDays(products[id]['createdDate'], new Date())
+      if(products[id]['category'] == 'fish' && products[id]['stock']!=0 && timeDifference<=1)
+      {
         var product = [(products[id]['price']/100).toFixed(2), products[id]['fishSelected']['forSinugba'],products[id]['fishSelected']['forFried'],products[id]['fishSelected']['forKilawin'],products[id]['fishSelected']['forTinuwa']]
         products[id]['distance'] = calculateKNNforCatchRecommender(userPreference,product)
-        console.log(products[id])
         recommendedCatch.push(products[id])
       }
     }
@@ -435,4 +434,14 @@ function calculateKNNforCatchRecommender(userPreference, catchProduct){
   return distance
 }
 
+function getDifferenceInDays(date1, date2) {
+  const diffInMs = Math.abs(date2 - date1);
+  return diffInMs / (1000 * 60 * 60 * 24);
+}
+
+function getDate(currentdate){
+  var datetime = new Date(currentdate).toLocaleDateString("en-US")
+  console.log("date created:", datetime)
+  return datetime;
+}
 exports.app = functions.https.onRequest(app)
