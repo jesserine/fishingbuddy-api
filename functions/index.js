@@ -154,7 +154,7 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
     for (let id in gearsetup) {
        gearsetuplist.push(gearsetup[id])
        var discretizedGearSetup = {rodScore: gearsetup[id].rodTypeIndex,reelScore: gearsetup[id].reelTypeIndex,braidlineScore: gearsetup[id].braidlineIndex,leaderlineScore: gearsetup[id].leaderlineIndex,lureScore: gearsetup[id].lureIndex,environmentScore: gearsetup[id].environmentTypeIndex,catchScore: gearsetup[id].catchTypeIndex,hobbyistScore: gearsetup[id].hobbyistTypeIndex,priceScore: (gearsetup[id].totalPrice/1000).toFixed(2),setupId: id, distanceScore: ''}
-       var distanceScore = calculateKNN( discretizedPreferredSetup,discretizedGearSetup)
+       var distanceScore = calculateKNNforGearRecommender( discretizedPreferredSetup,discretizedGearSetup)
        discretizedGearSetup.distanceScore = distanceScore
        discretizedGearSetupList.push(discretizedGearSetup)
     }
@@ -171,7 +171,7 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
   })
 })
 
-function calculateKNN(userPreference, gearSetups){
+function calculateKNNforGearRecommender(userPreference, gearSetups){
   var distance = (Math.pow(userPreference[0]-gearSetups.rodScore,2)+Math.pow(userPreference[1]-gearSetups.reelScore,2)+Math.pow(userPreference[2]-gearSetups.braidlineScore,2)+Math.pow(userPreference[3]-gearSetups.leaderlineScore,2)+Math.pow(userPreference[4]-gearSetups.lureScore,2)+Math.pow(userPreference[5]-gearSetups.environmentScore,2)+Math.pow(userPreference[6]-gearSetups.catchScore,2)+Math.pow(userPreference[7]-gearSetups.hobbyistScore,2)+Math.pow(userPreference[8]-gearSetups.priceScore,2)).toFixed(2)
   
   return distance
@@ -384,7 +384,7 @@ app.get('/api/fishinghotspots/:latitude/:longitude', async (req, res) => {
   })
 })
 
-//Haversine Formula
+//Haversine Formula to get the distance of two locations.
 function calculateDistance(curLatitude, curLongitude, hotspotLatitude, hotspotLongitude){
   const prevLatInRad = toRad(hotspotLatitude);
   const prevLongInRad = toRad(hotspotLongitude);
@@ -401,4 +401,38 @@ function calculateDistance(curLatitude, curLongitude, hotspotLatitude, hotspotLo
 function toRad(angle){
   return (angle * Math.PI) / 180;
 }
+
+// @desc    Fetch all fishing hotspots near fisherman/hobbyist's location.
+// @route   GET /api/fishinghotspots/:latitude/:longitude
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/recommendcatch/300/1/1/0/0
+app.get('/api/recommendcatch/:budget/:forSinugba/:forFried/:forKinilaw/:forTinuwa', async (req, res) => {
+  const snapshot = await db.ref('products')
+  const recommendedCatch = []
+  
+  var userPreference = [(req.params.budget/100).toFixed(2), req.params.forSinugba, req.params.forFried, req.params.forKinilaw, req.params.forTinuwa]
+  console.log("user preference: ", userPreference)
+
+  snapshot.on('value', (snapshot) => {
+    const products = snapshot.val()
+    for(let id in products){
+
+      if(products[id]['category'] == 'fish'){
+        var product = [(products[id]['price']/100).toFixed(2), products[id]['fishSelected']['forSinugba'],products[id]['fishSelected']['forFried'],products[id]['fishSelected']['forKilawin'],products[id]['fishSelected']['forTinuwa']]
+        products[id]['distance'] = calculateKNNforCatchRecommender(userPreference,product)
+        console.log(products[id])
+        recommendedCatch.push(products[id])
+      }
+    }
+
+    recommendedCatch.sort((a,b) => a.distance - b.distance);
+    res.status(200).send(JSON.stringify(recommendedCatch))
+  })
+})
+
+function calculateKNNforCatchRecommender(userPreference, catchProduct){
+  var distance = (Math.pow(userPreference[0]-catchProduct[0],2)+Math.pow(userPreference[1]-catchProduct[1],2)+Math.pow(userPreference[2]-catchProduct[2],2)+Math.pow(userPreference[3]-catchProduct[3],2)+Math.pow(userPreference[4]-catchProduct[4],2)).toFixed(2)
+  
+  return distance
+}
+
 exports.app = functions.https.onRequest(app)
