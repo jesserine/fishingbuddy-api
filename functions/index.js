@@ -136,6 +136,16 @@ app.get('/api/productsoncategory/:id', async (req, res) => {
   })
 })
 
+// @desc    Fetch all gear setups.
+// @route   GET /api/fishingtechniques/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/gearsetups
+app.get('/api/gearsetups', async (req, res) => {
+  const snapshot = await db.ref('gearsetup')
+  snapshot.on('value', (snapshot) => {
+    const gearsetups = snapshot.val()
+    res.status(200).send(JSON.stringify(gearsetups))
+  })
+})
 
 // @desc    Fetch top 3 recommended fishing gears.
 // @route   GET /api/recommendgear
@@ -151,15 +161,21 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
     
     var discretizedGearSetupList = []
     var gearRecommendationResult = []
+    var noRecommendation = [] //insuffecient data
     for (let id in gearsetup) {
+       if(gearsetup[id]['verified'] || gearsetup[id]['verified']=='true'){
+         console.log(gearsetup[id])
        gearsetuplist.push(gearsetup[id])
        var discretizedGearSetup = {rodScore: gearsetup[id].rodTypeIndex,reelScore: gearsetup[id].reelTypeIndex,braidlineScore: gearsetup[id].braidlineIndex,leaderlineScore: gearsetup[id].leaderlineIndex,lureScore: gearsetup[id].lureIndex,environmentScore: gearsetup[id].environmentTypeIndex,catchScore: gearsetup[id].catchTypeIndex,hobbyistScore: gearsetup[id].hobbyistTypeIndex,priceScore: (gearsetup[id].totalPrice/1000).toFixed(2),setupId: id, distanceScore: ''}
        var distanceScore = calculateKNNforGearRecommender( discretizedPreferredSetup,discretizedGearSetup)
        discretizedGearSetup.distanceScore = distanceScore
        discretizedGearSetupList.push(discretizedGearSetup)
+       }
     }
     
     discretizedGearSetupList.sort((a,b) => a.distanceScore - b.distanceScore);
+    console.log(discretizedGearSetupList.length)
+    if(discretizedGearSetupList.length > 3){
     var count = 0;
     while(count < 3){
     db.ref(`gearsetup/${discretizedGearSetupList[count].setupId}`).on('value',function(snapshot) {
@@ -168,6 +184,10 @@ app.get('/api/recommendgear/:reelType/:rodType/:braidlineType/:llineType/:lureTy
        count+=1
       }
     res.status(200).send(JSON.stringify(gearRecommendationResult))
+    } else{
+      console.log("no recommendation")
+    res.status(200).send(JSON.stringify(noRecommendation))
+    }
   })
 })
 
