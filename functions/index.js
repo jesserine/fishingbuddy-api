@@ -128,7 +128,7 @@ app.get('/api/productsoncategory/:id', async (req, res) => {
     const product = snapshot.val()
     const productslist = []
     for (let id in product) {
-      if(product[id].category==productCategory){
+      if(product[id].category==productCategory && product[id].isListed == 'yes'){
         productslist.push(product[id])
       }
     }
@@ -230,6 +230,7 @@ app.get('/api/fishlist', async (req, res) => {
     const fishList = []
     for (let id in fish) {
       fish[id]['fishID'] = id
+      console.log(fish[id])
       fishList.push(fish[id])
     }
     res.status(200).send(JSON.stringify(fishList))
@@ -418,6 +419,7 @@ app.get('/api/recommendcatch/:budget/:forSinugba/:forFried/:forKinilaw/:forTinuw
       if(products[id]['category'] == 'fish' && products[id]['stock']!=0 && timeDifference<=1)
       {
         var product = [(products[id]['price']/100).toFixed(2), products[id]['fishSelected']['forSinugba'],products[id]['fishSelected']['forFried'],products[id]['fishSelected']['forKilawin'],products[id]['fishSelected']['forTinuwa']]
+        console.log(product)
         products[id]['distance'] = calculateKNNforCatchRecommender(userPreference,product)
         recommendedCatch.push(products[id])
       }
@@ -444,4 +446,133 @@ function getDate(currentdate){
   console.log("date created:", datetime)
   return datetime;
 }
+
+//Add marketplace sort endpoint
+
+// @desc    Fetch all braidline types.
+// @route   GET /api/braidlines
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/braidlines
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/braidlines
+app.get('/api/braidlines', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/braidlineType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const braidlines = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['braidlineTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      braidlines.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(braidlines))
+  })
+})
+
+// @desc    Fetch all catch types.
+// @route   GET /api/catchtypes
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/catchtypes
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/catchtypes
+app.get('/api/catchtypes', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/catchType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const catchTypes = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['catchTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      catchTypes.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(catchTypes))
+  })
+})
+
+// @desc    Fetch all environment types.
+// @route   GET /api/environments
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/environments
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/environments
+app.get('/api/environments', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/environmentType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const environmentTypes = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['fishingEnviTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      environmentTypes.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(environmentTypes))
+  })
+})
+
+// @desc    Fetch all leaderline types.
+// @route   GET /api/leaderlines
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/leaderlines
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/leaderlines
+app.get('/api/leaderlines', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/leaderlineType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const leaderlines = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['leaderlineTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      leaderlines.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(leaderlines))
+  })
+})
+
+// @desc    Fetch all lure types.
+// @route   GET /api/lures
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/lures
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/lures
+app.get('/api/lures', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/lureType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const lures = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['lureTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      lures.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(lures))
+  })
+})
+
+// @desc    Fetch all reel types.
+// @route   GET /api/reels
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/reels
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/reels
+app.get('/api/reels', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/reelType')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const reels = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['reelTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      reels.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(reels))
+  })
+})
+
+// @desc    Fetch all rod types.
+// @route   GET /api/rods
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/rods
+//sample    https://us-central1-fishingbuddy-web.cloudfunctions.net/app/api/rods
+app.get('/api/rods', async (req, res) => {
+  const snapshot = await db.ref('hobbyist/rodTypes')
+  snapshot.on('value', (snapshot) => {
+    const result = snapshot.val()
+    const rods = []
+    for(let id in result){
+      result[id]['gearTypeName'] = result[id]['rodTypeName']
+      result[id]['gearTypeIndex'] = result[id]['recommenderIndex']
+      rods.push(result[id])
+    }
+    res.status(200).send(JSON.stringify(rods))
+  })
+})
+
 exports.app = functions.https.onRequest(app)
