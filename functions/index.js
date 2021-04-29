@@ -437,7 +437,7 @@ app.get('/api/recommendcatch/:budget/:forSinugba/:forFried/:forKinilaw/:forTinuw
     for(let id in products){
       var timeDifference = getDifferenceInDays(products[id]['createdDate'], new Date())
       console.log(products)
-      if(products[id]['category'] == 'fish' && products[id]['stock']!=0 && timeDifference<=1 && products[id][isListed]== 'yes')
+      if(products[id]['category'] == 'fish' && products[id]['stock']!=0 && timeDifference<=1 && products[id]['isListed']== 'yes')
       {
         var product = [(products[id]['price']/100).toFixed(2), products[id]['fishSelected']['forSinugba'],products[id]['fishSelected']['forFried'],products[id]['fishSelected']['forKilawin'],products[id]['fishSelected']['forTinuwa']]
         console.log(product)
