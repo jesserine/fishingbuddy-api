@@ -596,4 +596,62 @@ app.get('/api/rods', async (req, res) => {
   })
 })
 
+// @desc    Fetch all user trips.
+// @route   GET /api/hotspots/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/hotspots/DavLTQLiy6dZXtBRB2pIst5HHwv1
+app.get('/api/hotspots/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`hotspot`)
+
+  snapshot.on('value', (snapshot) => {
+    const hotspots = snapshot.val()
+    console.log(hotspots)
+    const userHotspots = []
+      for (let id in hotspots) {
+        if(hotspots[id]['uuid']==paramId){
+          userHotspots.push(hotspots[id])
+        }
+      }
+      res.status(200).send(JSON.stringify(userHotspots))
+    })
+})
+
+// @desc    Fetch all user catch.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/userCatch/XHeEMkE1QgSEIePxrX56aOy19bf2
+app.get('/api/userCatch/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`user/${paramId}`)
+  const userCatch = []
+  snapshot.on('value', (snapshot) => {
+    const user = snapshot.val()
+    const userPosts = user['posts']
+    for(let id in userPosts){
+      if(userPosts[id]['catch']!=null){
+        userCatch.push(userPosts[id]['catch'])
+      }
+    }
+    res.status(200).send(JSON.stringify(userCatch))
+  })
+})
+
+// @desc    Fetch all user products.
+// @route   GET /api/endangeredspecies/:id
+//sample    http://localhost:5001/fishingbuddy-web/us-central1/app/api/userProducts/Mamsa
+app.get('/api/userProducts/:id', async (req, res) => {
+  const paramId = req.params.id
+  const snapshot = await db.ref(`products`)
+
+  snapshot.on('value', (snapshot) => {
+    const products = snapshot.val()
+    const userProducts = []
+      for (let id in products) {
+        if((products[id]['title']).includes(paramId) && products[id]['isListed']=='yes'){
+          userProducts.push(products[id])
+        }
+      }
+      res.status(200).send(JSON.stringify(userProducts))
+    })
+})
+
 exports.app = functions.https.onRequest(app)
